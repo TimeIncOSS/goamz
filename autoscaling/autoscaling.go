@@ -430,6 +430,7 @@ type UpdateAutoScalingGroup struct {
 	TerminationPolicies     []string
 	Name                    string
 	VPCZoneIdentifier       []string
+	Tags                    []Tag
 
 	SetDefaultCooldown        bool
 	SetDesiredCapacity        bool
@@ -484,8 +485,10 @@ func (autoscaling *AutoScaling) UpdateAutoScalingGroup(options *UpdateAutoScalin
 		params["TerminationPolicies.member."+strconv.Itoa(i+1)] = v
 	}
 
-	if options.VPCZoneIdentifier != nil {
-		params["VPCZoneIdentifier"] = strings.Join(options.VPCZoneIdentifier, ",")
+	for i, v := range options.Tags {
+		params["Tags."+strconv.Itoa(i+1)+".Key"] = v.Key
+		params["Tags."+strconv.Itoa(i+1)+".Value"] = v.Value
+		params["Tags."+strconv.Itoa(i+1)+".PropagateAtLaunch"] = strconv.FormatBool(v.PropagateAtLaunch)
 	}
 
 	resp = &SimpleResp{}

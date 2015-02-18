@@ -377,12 +377,16 @@ func SharedAuth() (auth Auth, err error) {
 
 	auth.AccessKey = profile["aws_access_key_id"]
 	auth.SecretKey = profile["aws_secret_access_key"]
+	auth.Token = profile["aws_session_token"]
 
 	if auth.AccessKey == "" {
 		err = errors.New("AWS_ACCESS_KEY_ID not found in environment in credentials file")
 	}
 	if auth.SecretKey == "" {
 		err = errors.New("AWS_SECRET_ACCESS_KEY not found in credentials file")
+	}
+	if auth.Token == "" {
+		err = errors.New("AWS_SESSION_TOKEN not found in credentials file")
 	}
 	return
 }
@@ -402,13 +406,19 @@ func EnvAuth() (auth Auth, err error) {
 		auth.SecretKey = os.Getenv("AWS_SECRET_KEY")
 	}
 
-	auth.Token = os.Getenv("AWS_SECURITY_TOKEN")
+	auth.Token = os.Getenv("AWS_SESSION_TOKEN")
+	if auth.Token == "" {
+		auth.Token = os.Getenv("AWS_SECURITY_TOKEN")
+	}
 
 	if auth.AccessKey == "" {
 		err = errors.New("AWS_ACCESS_KEY_ID or AWS_ACCESS_KEY not found in environment")
 	}
 	if auth.SecretKey == "" {
 		err = errors.New("AWS_SECRET_ACCESS_KEY or AWS_SECRET_KEY not found in environment")
+	}
+	if auth.Token == "" {
+		err = errors.New("AWS_SESSION_TOKEN or AWS_SECURITY_TOKEN not found in environment")
 	}
 	return
 }
